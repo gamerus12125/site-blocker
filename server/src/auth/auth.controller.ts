@@ -25,10 +25,13 @@ export class AuthController {
   @Post('sign-in')
   @ApiOkResponse()
   @HttpCode(HttpStatus.OK)
-  async signIn(@Body() body: SignInBodyDTO, @Res() res: Response) {
-    const { token } = await this.authService.signIn(body.email, body.password);
+  async signIn(@Body() body: SignInBodyDTO, @Res({passthrough: true}) res: Response) {
+    const { accessToken } = await this.authService.signIn(
+      body.email,
+      body.password,
+    );
 
-    this.cookieService.setToken(res, token);
+    this.cookieService.setToken(res, accessToken);
   }
 
   @Post('sign-up')
@@ -47,7 +50,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
   signOut(@Res({ passthrough: true }) res: Response) {
-    this.cookieService.removeToken(res)
+    this.cookieService.removeToken(res);
   }
 
   @Get('session')
